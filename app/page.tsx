@@ -17,11 +17,23 @@ export default function Home() {
   const [confirmClear, setConfirmClear] = useState(false)
   const [historyView, setHistoryView] = useState<{ weekStart: string; meals: Meal[] } | null>(null)
   const [saveError, setSaveError] = useState<string | null>(null)
+  const [isPortrait, setIsPortrait] = useState(false)
 
   const weekStart = getCurrentWeekStart()
 
   useEffect(() => {
     fetchMeals()
+  }, [])
+
+  useEffect(() => {
+    function checkOrientation() {
+      // Only show rotate hint on small screens (phones), not tablets/desktop
+      const isMobile = Math.max(window.innerWidth, window.innerHeight) < 1024
+      setIsPortrait(isMobile && window.innerHeight > window.innerWidth)
+    }
+    checkOrientation()
+    window.addEventListener('resize', checkOrientation)
+    return () => window.removeEventListener('resize', checkOrientation)
   }, [])
 
   async function fetchMeals() {
@@ -43,14 +55,17 @@ export default function Home() {
   async function saveMeal(day: Day, mealType: MealType, dish: string, ingredients: string, isLeftovers: boolean) {
     setSaveError(null)
 
-    const { error: upsertError } = await supabase.from('meals').upsert(
-      { week_start: weekStart, day, meal_type: mealType, dish, ingredients, is_leftovers: isLeftovers, auto_filled: false },
-      { onConflict: 'week_start,day,meal_type' }
+    // Delete any existing entry first so updates always work cleanly
+    await supabase.from('meals').delete()
+      .eq('week_start', weekStart).eq('day', day).eq('meal_type', mealType)
+
+    const { error } = await supabase.from('meals').insert(
+      { week_start: weekStart, day, meal_type: mealType, dish, ingredients, is_leftovers: isLeftovers, auto_filled: false }
     )
 
-    if (upsertError) {
-      console.error('Save error:', upsertError)
-      setSaveError(`Could not save: ${upsertError.message}`)
+    if (error) {
+      console.error('Save error:', error)
+      setSaveError(`Could not save: ${error.message}`)
       return
     }
 
@@ -58,9 +73,10 @@ export default function Home() {
       const nextDay = getNextDay(day)
       if (nextDay) {
         if (isLeftovers) {
-          await supabase.from('meals').upsert(
-            { week_start: weekStart, day: nextDay, meal_type: 'lunch', dish: 'Leftovers', ingredients: '', is_leftovers: false, auto_filled: true },
-            { onConflict: 'week_start,day,meal_type' }
+          await supabase.from('meals').delete()
+            .eq('week_start', weekStart).eq('day', nextDay).eq('meal_type', 'lunch')
+          await supabase.from('meals').insert(
+            { week_start: weekStart, day: nextDay, meal_type: 'lunch', dish: 'Leftovers', ingredients: '', is_leftovers: false, auto_filled: true }
           )
         } else {
           await supabase.from('meals').delete()
@@ -101,6 +117,21 @@ export default function Home() {
 
   return (
     <main className="h-full overflow-hidden bg-white flex flex-col">
+      {/* Rotate hint — shown only when phone is in portrait */}
+      {isPortrait && (
+        <div className="fixed inset-0 z-[200] bg-emerald-600 flex flex-col items-center justify-center gap-5 px-8">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="4" y="2" width="16" height="20" rx="2" />
+            <path d="M9 21h6" />
+            {/* Rotation arrows */}
+            <path d="M17 8 A6 6 0 0 1 7 8" />
+            <polyline points="17 5 17 8 20 8" />
+          </svg>
+          <p className="text-white font-extrabold text-xl text-center">Rotate your phone</p>
+          <p className="text-emerald-100 text-sm text-center">This app works in landscape mode</p>
+        </div>
+      )}
+
       <Header
         weekRange={formatWeekRange(weekStart)}
         onMenuClick={() => setMenuOpen(true)}

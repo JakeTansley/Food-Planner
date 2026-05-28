@@ -8,10 +8,18 @@ interface Props {
   readOnly?: boolean
 }
 
+function dishFontClass(dish: string): string {
+  const len = dish.length
+  if (len <= 6)  return 'text-sm font-extrabold'
+  if (len <= 12) return 'text-xs font-bold'
+  if (len <= 20) return 'text-[10px] font-bold'
+  return 'text-[9px] font-bold'
+}
+
 export default function MealCell({ meal, showLeftoverArrow, isAutoFilled, onClick, readOnly = false }: Props) {
   const hasContent = Boolean(meal?.dish)
 
-  const baseClass = 'relative w-full h-full rounded-lg text-left overflow-hidden p-1.5'
+  const baseClass = 'relative w-full h-full rounded-lg overflow-hidden'
 
   const colorClass = hasContent
     ? isAutoFilled
@@ -21,18 +29,29 @@ export default function MealCell({ meal, showLeftoverArrow, isAutoFilled, onClic
 
   const content = (
     <>
-      {hasContent ? (
-        <span className="block font-bold text-black leading-tight text-[12px] line-clamp-3">
-          {meal!.dish}
-        </span>
-      ) : (
-        !readOnly && <span className="text-gray-300 text-lg leading-none font-light">+</span>
-      )}
+      {/* Recipe title — fills cell, scales with name length */}
+      <div className="h-full w-full flex items-center justify-center p-1">
+        {hasContent ? (
+          <span className={`text-center text-black leading-tight break-words hyphens-auto w-full ${dishFontClass(meal!.dish)}`}>
+            {meal!.dish}
+          </span>
+        ) : (
+          !readOnly && <span className="text-gray-300 text-base leading-none font-light">+</span>
+        )}
+      </div>
+
+      {/* Leftover arrow on dinner cell — points ↗ toward tomorrow's lunch */}
       {showLeftoverArrow && (
-        <span className="absolute bottom-0.5 right-0.5 text-amber-500 text-[10px] leading-none">↘</span>
+        <span className="absolute top-0.5 right-0.5 bg-amber-400 text-white text-[8px] font-bold leading-none rounded-full w-3.5 h-3.5 flex items-center justify-center">
+          ↗
+        </span>
       )}
+
+      {/* Auto-filled badge on lunch cell — points ↙ back toward yesterday's dinner */}
       {isAutoFilled && (
-        <span className="absolute top-0.5 right-0.5 text-amber-500 text-[10px] leading-none">↩</span>
+        <span className="absolute bottom-0.5 left-0.5 bg-amber-400 text-white text-[8px] font-bold leading-none rounded-full w-3.5 h-3.5 flex items-center justify-center">
+          ↙
+        </span>
       )}
     </>
   )
