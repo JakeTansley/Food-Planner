@@ -16,6 +16,7 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [confirmClear, setConfirmClear] = useState(false)
   const [historyView, setHistoryView] = useState<{ weekStart: string; meals: Meal[] } | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   const weekStart = getCurrentWeekStart()
 
@@ -24,10 +25,14 @@ export default function Home() {
   }, [])
 
   async function fetchMeals() {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('meals')
       .select('*')
       .eq('week_start', weekStart)
+    if (error) {
+      console.error('Fetch error:', error)
+      setSaveError(`Could not load meals: ${error.message}`)
+    }
     if (data) setMeals(data as Meal[])
   }
 
@@ -36,10 +41,18 @@ export default function Home() {
   }
 
   async function saveMeal(day: Day, mealType: MealType, dish: string, ingredients: string, isLeftovers: boolean) {
-    await supabase.from('meals').upsert(
+    setSaveError(null)
+
+    const { error: upsertError } = await supabase.from('meals').upsert(
       { week_start: weekStart, day, meal_type: mealType, dish, ingredients, is_leftovers: isLeftovers, auto_filled: false },
       { onConflict: 'week_start,day,meal_type' }
     )
+
+    if (upsertError) {
+      console.error('Save error:', upsertError)
+      setSaveError(`Could not save: ${upsertError.message}`)
+      return
+    }
 
     if (mealType === 'dinner') {
       const nextDay = getNextDay(day)
@@ -87,12 +100,20 @@ export default function Home() {
   }
 
   return (
-    <main className="h-screen overflow-hidden bg-gray-900 flex flex-col">
+    <main className="h-full overflow-hidden bg-white flex flex-col">
       <Header
         weekRange={formatWeekRange(weekStart)}
         onMenuClick={() => setMenuOpen(true)}
         onClearAll={() => setConfirmClear(true)}
       />
+
+      {saveError && (
+        <div className="mx-3 mt-2 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs shrink-0">
+          {saveError}
+          <button className="ml-2 underline" onClick={() => setSaveError(null)}>Dismiss</button>
+        </div>
+      )}
+
       <div className="flex-1 min-h-0 p-2">
         <MealGrid meals={meals} onCellClick={(day, mealType) => setSelectedCell({ day, mealType })} />
       </div>
@@ -125,20 +146,20 @@ export default function Home() {
 
       {confirmClear && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setConfirmClear(false)} />
-          <div className="relative bg-gray-800 rounded-2xl p-6 mx-6 flex flex-col gap-4 w-full max-w-sm">
-            <h3 className="text-white font-semibold text-center">Clear this week?</h3>
-            <p className="text-gray-400 text-sm text-center">All meals for this week will be permanently deleted.</p>
+          <div className="absolute inset-0 bg-black/40" onClick={() => setConfirmClear(false)} />
+          <div className="relative bg-white rounded-2xl p-6 mx-6 flex flex-col gap-4 w-full max-w-sm shadow-xl">
+            <h3 className="text-black font-bold text-center">Clear this week?</h3>
+            <p className="text-gray-500 text-sm text-center">All meals for this week will be permanently deleted.</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setConfirmClear(false)}
-                className="flex-1 py-3 rounded-xl border border-gray-600 text-gray-400 text-sm font-semibold hover:border-gray-400 transition-colors"
+                className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-600 text-sm font-semibold hover:border-gray-400 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={clearAllMeals}
-                className="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors"
+                className="flex-1 py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white text-sm font-bold transition-colors"
               >
                 Clear All
               </button>

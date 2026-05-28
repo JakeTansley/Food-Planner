@@ -23,31 +23,31 @@ export default function HistoryView({ weekStart, meals, onBack, onReinstate }: P
     .sort((a, b) => a.localeCompare(b))
 
   return (
-    <div className="fixed inset-0 z-50 bg-gray-900 flex flex-col">
-      <div className="flex items-center px-3 py-2 border-b border-gray-800 shrink-0">
-        <button onClick={onBack} className="text-blue-400 text-sm hover:text-blue-300 mr-3">
+    <div className="fixed inset-0 z-50 bg-white flex flex-col">
+      <div className="flex items-center px-3 py-2 bg-emerald-600 shrink-0">
+        <button onClick={onBack} className="text-emerald-100 hover:text-white text-sm font-semibold mr-3 transition-colors">
           ← Back
         </button>
         <div className="flex-1 text-center">
-          <p className="text-gray-500 text-[10px] uppercase tracking-wider">Previous Week</p>
-          <h2 className="text-white font-bold text-sm">{formatWeekRange(weekStart)}</h2>
+          <p className="text-emerald-200 text-[10px] uppercase tracking-wider font-bold">Previous Week</p>
+          <h2 className="text-white font-extrabold text-sm">{formatWeekRange(weekStart)}</h2>
         </div>
         <div className="w-16" />
       </div>
 
-      <div className="flex border-b border-gray-800 shrink-0">
+      <div className="flex border-b border-gray-200 shrink-0">
         <button
           onClick={() => setTab('grid')}
-          className={`flex-1 py-2 text-xs font-semibold transition-colors ${
-            tab === 'grid' ? 'text-white border-b-2 border-blue-500' : 'text-gray-500 hover:text-gray-300'
+          className={`flex-1 py-2.5 text-xs font-bold transition-colors ${
+            tab === 'grid' ? 'text-emerald-700 border-b-2 border-emerald-600' : 'text-gray-400 hover:text-gray-600'
           }`}
         >
           Meal Plan
         </button>
         <button
           onClick={() => setTab('shopping')}
-          className={`flex-1 py-2 text-xs font-semibold transition-colors ${
-            tab === 'shopping' ? 'text-white border-b-2 border-blue-500' : 'text-gray-500 hover:text-gray-300'
+          className={`flex-1 py-2.5 text-xs font-bold transition-colors ${
+            tab === 'shopping' ? 'text-emerald-700 border-b-2 border-emerald-600' : 'text-gray-400 hover:text-gray-600'
           }`}
         >
           Shopping List ({allIngredients.length})
@@ -63,12 +63,12 @@ export default function HistoryView({ weekStart, meals, onBack, onReinstate }: P
         {tab === 'shopping' && (
           <div className="h-full overflow-y-auto p-4">
             {allIngredients.length === 0 ? (
-              <p className="text-gray-500 text-sm">No ingredients recorded for this week.</p>
+              <p className="text-gray-400 text-sm">No ingredients recorded for this week.</p>
             ) : (
               <ul className="space-y-2">
                 {allIngredients.map((ingredient, i) => (
-                  <li key={i} className="flex items-center gap-2.5 text-sm text-white">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0" />
+                  <li key={i} className="flex items-center gap-2.5 text-sm text-black">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
                     {ingredient}
                   </li>
                 ))}
@@ -78,22 +78,22 @@ export default function HistoryView({ weekStart, meals, onBack, onReinstate }: P
         )}
       </div>
 
-      <div className="p-4 border-t border-gray-800 shrink-0">
+      <div className="p-4 border-t border-gray-200 shrink-0">
         {confirming ? (
           <>
-            <p className="text-amber-400 text-xs text-center mb-3">
+            <p className="text-amber-600 text-xs text-center mb-3 font-semibold">
               This will replace your current week&apos;s plan. Continue?
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setConfirming(false)}
-                className="flex-1 py-3 rounded-xl border border-gray-600 text-gray-400 text-sm font-semibold hover:border-gray-400 transition-colors"
+                className="flex-1 py-3 rounded-xl border border-gray-300 text-gray-600 text-sm font-semibold hover:border-gray-400 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={() => { setConfirming(false); onReinstate() }}
-                className="flex-1 py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold transition-colors"
+                className="flex-1 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold transition-colors"
               >
                 Yes, Reinstate
               </button>
@@ -102,7 +102,7 @@ export default function HistoryView({ weekStart, meals, onBack, onReinstate }: P
         ) : (
           <button
             onClick={() => setConfirming(true)}
-            className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold transition-colors"
+            className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-sm font-bold transition-colors"
           >
             Reinstate this Week
           </button>

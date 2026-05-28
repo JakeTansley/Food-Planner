@@ -6,10 +6,10 @@ interface Props {
 
 export default function Header({ weekRange, onMenuClick, onClearAll }: Props) {
   return (
-    <div className="flex items-center px-3 py-2 bg-gray-900 border-b border-gray-800 shrink-0">
+    <div className="flex items-center px-3 bg-emerald-600 shrink-0" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.5rem)', paddingBottom: '0.5rem' }}>
       <button
         onClick={onMenuClick}
-        className="text-white p-1 mr-3 hover:text-gray-300 active:text-gray-500"
+        className="text-white p-1 mr-3 hover:text-emerald-100 active:text-emerald-200"
         aria-label="Open menu"
       >
         <svg width="22" height="22" viewBox="0 0 22 22" fill="currentColor">
@@ -19,12 +19,12 @@ export default function Header({ weekRange, onMenuClick, onClearAll }: Props) {
         </svg>
       </button>
       <div className="flex-1 text-center">
-        <h1 className="text-white font-bold text-sm leading-tight">Meal Plan</h1>
-        <p className="text-gray-400 text-xs leading-tight">{weekRange}</p>
+        <h1 className="text-white font-extrabold text-base leading-tight">Meal Plan</h1>
+        <p className="text-emerald-100 text-xs leading-tight">{weekRange}</p>
       </div>
       <button
         onClick={onClearAll}
-        className="text-gray-500 hover:text-red-400 active:text-red-600 p-1 transition-colors"
+        className="text-emerald-200 hover:text-white active:text-emerald-100 p-1 transition-colors"
         aria-label="Clear all meals"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -1,0 +1,9 @@
+{
+  "name": "Meal Plan",
+  "short_name": "Meals",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#059669",
+  "orientation": "portrait-primary"
+}

@@ -26,7 +26,7 @@ export default function MealGrid({ meals, onCellClick, readOnly = false }: Props
       <div className="flex gap-0.5 shrink-0">
         <div className="w-12 shrink-0" />
         {DAYS.map(day => (
-          <div key={day} className="flex-1 text-center text-[10px] font-semibold text-gray-400 uppercase py-1">
+          <div key={day} className="flex-1 text-center text-[10px] font-bold text-emerald-700 uppercase py-1 tracking-wide">
             {DAY_LABELS[day]}
           </div>
         ))}
@@ -36,7 +36,7 @@ export default function MealGrid({ meals, onCellClick, readOnly = false }: Props
       {MEAL_TYPES.map(mealType => (
         <div key={mealType} className="flex-1 flex gap-0.5 min-h-0">
           <div className="w-12 shrink-0 flex items-center justify-center">
-            <span className="text-[10px] font-semibold text-gray-400 uppercase">
+            <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-wide">
               {MEAL_LABELS[mealType]}
             </span>
           </div>
