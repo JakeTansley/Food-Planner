@@ -12,9 +12,10 @@ const MEAL_LABELS: Record<MealType, string> = {
 interface Props {
   meals: Meal[]
   onCellClick: (day: Day, mealType: MealType) => void
+  readOnly?: boolean
 }
 
-export default function MealGrid({ meals, onCellClick }: Props) {
+export default function MealGrid({ meals, onCellClick, readOnly = false }: Props) {
   function getMeal(day: Day, mealType: MealType): Meal | undefined {
     return meals.find(m => m.day === day && m.meal_type === mealType)
   }
@@ -49,6 +50,7 @@ export default function MealGrid({ meals, onCellClick }: Props) {
                   showLeftoverArrow={mealType === 'dinner' && (meal?.is_leftovers ?? false)}
                   isAutoFilled={meal?.auto_filled ?? false}
                   onClick={() => onCellClick(day, mealType)}
+                  readOnly={readOnly}
                 />
               </div>
             )
